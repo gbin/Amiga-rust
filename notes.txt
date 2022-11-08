@@ -1,0 +1,141 @@
+Gccrs route
+-----------
+
+git clone https://github.com/Rust-GCC/gccrs.git
+cd gccrs
+mkdir build
+cd build
+../configure --target=m68k-elf --prefix="/home/gbin/prefix" --disable-nls --enable-languages=rust --without-headers
+make -j12 all-gcc
+make install-gcc
+
+git clone git://sourceware.org/git/binutils-gdb.git
+cd binutils-gdb
+mkdir build
+cd build
+
+../configure --prefix="/home/gbin/prefix/" --target=m68k-elf --disable-multilib
+make -j12
+make install
+
+rustc +nightly -Z unstable-options --print target-list
+[...]
+m68k-unknown-linux-gnu
+[...]
+
+we compile to elf... try to use elf2hunk
+mkdir elf2hunk
+cd elf2hunk
+wget https://raw.githubusercontent.com/aros-development-team/AROS/master/tools/elf2hunk/elf2hunk.c
+gcc elf2hunk.c -DDEBUG -o elf2hunk
+elf2hunk/elf2hunk test test.amiga
+
+# amitools has a hunk dumper
+yay -S amitools
+
+---- rustc route
+
+pal ➜  amiga-rust (master) ✗ rustc +nightly -Z unstable-options --target=m68k-unknown-linux-gnu --print target-spec-json
+{
+  "arch": "m68k",
+  "crt-static-respected": true,
+  "data-layout": "E-m:e-p:32:16:32-i8:8:8-i16:16:16-i32:16:32-n8:16:32-a:0:16-S16",
+  "dynamic-linking": true,
+  "env": "gnu",
+  "has-rpath": true,
+  "has-thread-local": true,
+  "is-builtin": true,
+  "llvm-target": "m68k-unknown-linux-gnu",
+  "max-atomic-width": 32,
+  "os": "linux",
+  "position-independent-executables": true,
+  "relro-level": "full",
+  "supported-split-debuginfo": [
+    "packed",
+    "unpacked",
+    "off"
+  ],
+  "target-endian": "big",
+  "target-family": [
+    "unix"
+  ],
+  "target-mcount": "_mcount",
+  "target-pointer-width": "32"
+}
+
+# add the target runtime precompiled
+rustup target add m68k-unknown-linux-gnu
+
+# building llvm for m68k
+https://m680x0.github.io/doc/build-from-source
+
+# getting the various options from our newly minted llvm
+sal ➜  bin (main) ✗ ./llc -march=m68k -mattr=help                                                                                                                                    
+Available CPUs for this target:                                                                                                                                                            
+                                                                                                                                                                                           
+  M68000  - Select the M68000 processor.                                                                                                                                                   
+  M68010  - Select the M68010 processor.                                                                                                                                                   
+  M68020  - Select the M68020 processor.                                                                                                                                                   
+  M68030  - Select the M68030 processor.                                                                                                                                                   
+  M68040  - Select the M68040 processor.                                                                                                                                                   
+  M68060  - Select the M68060 processor.                                                                                                                                                   
+  generic - Select the generic processor.                                                                                                                                                  
+                                                                                                                                                                                           
+Available features for this target:     
+                                              
+  isa-68000  - Is M68000 ISA supported. 
+  isa-68010  - Is M68010 ISA supported. 
+  isa-68020  - Is M68020 ISA supported.  
+  isa-68030  - Is M68030 ISA supported.
+  isa-68040  - Is M68040 ISA supported.
+  isa-68060  - Is M68060 ISA supported.
+  reserve-a0 - Reserve A0 register.    
+  reserve-a1 - Reserve A1 register.    
+  reserve-a2 - Reserve A2 register.    
+  reserve-a3 - Reserve A3 register.    
+  reserve-a4 - Reserve A4 register.    
+  reserve-a5 - Reserve A5 register.    
+  reserve-a6 - Reserve A6 register.
+  reserve-d0 - Reserve D0 register.
+  reserve-d1 - Reserve D1 register.
+  reserve-d2 - Reserve D2 register.
+  reserve-d3 - Reserve D3 register.
+  reserve-d4 - Reserve D4 register.
+  reserve-d5 - Reserve D5 register.
+  reserve-d6 - Reserve D6 register.           
+  reserve-d7 - Reserve D7 register.                                                          
+                                                                                             
+Use +feature to enable a feature, or -feature to disable it.
+For example, llc -mcpu=mycpu -mattr=+feature1,-feature2
+
+# print all the targets
+rustc --print target-list
+
+# We can use a target like this
+cargo build --target x86_64-blog_os.json
+
+or 
+
+[build]
+target = "x86_64-blog_os.json"
+
+# for a custom platform we need to rebuild core, can be done here:
+https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#build-std
+
+# for example
+cargo +nightly build -Z build-std=core,alloc
+
+or 
+
+# in .cargo/config.toml
+[unstable]
+build-std = ["core", "compiler_builtins"]
+
+
+
+
+
+
+
+
+

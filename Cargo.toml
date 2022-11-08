@@ -1,0 +1,16 @@
+[package]
+name = "amiga_rust"
+version = "0.1.0"
+edition = "2021"
+
+
+
+[dependencies]
+
+
+# those 2 are to not try to unwind the stack in case of panic, just stop.
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
