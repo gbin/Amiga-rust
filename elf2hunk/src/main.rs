@@ -1,6 +1,12 @@
 use std::env;
 use elf::File;
+use num::FromPrimitive;
+#[macro_use]
+extern crate num_derive;
 
+
+#[derive(FromPrimitive, Debug)]
+#[repr(u8)]
 enum sym_type {
     STB_LOCAL=0,
     STB_GLOBAL=1,
@@ -28,8 +34,9 @@ fn main() {
         let symbol_name = strtab
             .get(symbol.st_name as usize)
             .expect("Failed to get name from strtab");
-        let t = symbol.st_symtype();
-        println!("{symbol_name}: {t}");
+        let symbol_type = symbol.st_symtype();
+        let t:sym_type = FromPrimitive::from_u8(symbol_type).expect(format!("Invalid Symbol type '{symbol_type}'").as_str());
+        println!("{symbol_name}: {t:?}");
 
 
         }

@@ -1,7 +1,9 @@
 #!/bin/zsh
 set -e
-m68k-elf-gcc -g -O2 -fPIC -march=68000 -c src/ks13.c -o src/ks13.o
-m68k-elf-gccrs -g -O2 -fpie -march=68000 -ffunction-sections -fdata-sections --entry main -Wl,--script=link.script -nostdlib src/main.rs src/ks13.o -o hello
+m68k-elf-gcc -g -O2 -march=68000 -c src/ks13.c -o src/ks13.o
+#m68k-elf-gccrs -g -O2 -march=68000 -ffunction-sections -fdata-sections --entry main -Wl,--script=link.script -nostdlib src/main.rs src/ks13.o -o hello
+m68k-elf-gccrs -S -g -O2 -march=68000 -ffunction-sections -fdata-sections --entry main -Wl,--script=link.script -nostdlib src/main.rs src/ks13.o -o hello.s
+#m68k-elf-gccrs -g -O2 -fpie -march=68000 --entry main -nostdlib -c src/main.rs -o src/main.o
 
 
 ## Dump some details about the generated elf
