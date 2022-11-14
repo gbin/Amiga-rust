@@ -13,3 +13,5 @@ target
 src/*.o
 .idea
 elf2hunk/elf2hunk
+elf2hunk/Cargo.lock
+
