@@ -8,9 +8,6 @@
 // move.l  d0,base
 //
 
-__attribute__((section(".text")))
-const char * const BLAH = "Blah";
-
 void* _openlib(char* name, int version) {
     asm("movea.l (4), %a6");
     asm("movel %0, %%a1"::"r"(name));
